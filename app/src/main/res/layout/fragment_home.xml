@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+            name="homeviewmodel"
+            type="com.example.galleryapp.fragments.home.HomeViewModel" />
+    </data>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.home.HomeFragment"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="20dp"
+            android:background="@drawable/et_search_bg"
+            android:drawableRight="@drawable/baseline_search_24"
+            android:padding="10dp"
+            android:textSize="14sp"
+            android:hint="ابحث"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/cairo_medium2"
+            android:imeOptions="actionSearch"
+            android:elevation="5dp"
+            android:singleLine= "true"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/images_recycler"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+    </LinearLayout>
+</layout>
