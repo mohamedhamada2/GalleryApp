@@ -12,12 +12,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.currency.dagger.MyApplication
 import com.example.galleryapp.R
 import com.example.galleryapp.api.Api
 import com.example.galleryapp.databinding.FragmentHomeBinding
 import retrofit2.Retrofit
 import javax.inject.Inject
+
 
 class HomeFragment : Fragment() {
     lateinit var homeViewModel: HomeViewModel
@@ -26,27 +28,28 @@ class HomeFragment : Fragment() {
     @Inject
     lateinit var retrofit: Retrofit
     lateinit var api: Api
-    lateinit var gridLayoutManager: LinearLayoutManager
-    lateinit var imagesAdapter: ImagesAdapter
-    var isloading :Boolean = false
+    lateinit var layoutManager: LinearLayoutManager
+
+    private var isloading = false
     private var pastvisibleitem = 0
-    private  var visibleitemcount:Int = 0
-    private  var totalitemcount:Int = 0
-    private  var previous_total:Int = 0
-    var view_threshold = 1
+    private  var visibleitemcount = 0
+    private  var totalitemcount= 0
+    private  var previous_total = 0
+    var view_threshold  = 15
     var page = 1
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        fragmentHomeBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        fragmentHomeBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         val view = fragmentHomeBinding.root;
         homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
+        //homeViewModel = HomeViewModel(requireContext(),this)
         (activity?.application as MyApplication).getAppComponent()!!.inject(this)
         api = retrofit.create(Api::class.java)
-        gridLayoutManager = LinearLayoutManager(activity)
+        layoutManager = LinearLayoutManager(activity)
+
         /*fragmentHomeBinding.etSearch.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 performSearch()
@@ -60,12 +63,38 @@ class HomeFragment : Fragment() {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                visibleitemcount = gridLayoutManager.getChildCount();
-                totalitemcount = gridLayoutManager.getItemCount();
-                pastvisibleitem = gridLayoutManager.findFirstVisibleItemPosition();
                 search = p0.toString();
+                page = 1
+                pastvisibleitem = 0
+                visibleitemcount = 0
+                totalitemcount= 0
+                previous_total = 0
+                view_threshold  = 15
                 //search = fragmentHomeBinding.etSearch.text.toString()
                 homeViewModel.search_in_gallery(search, 1, api)
+                fragmentHomeBinding.imagesRecycler.addOnScrollListener(object :
+                    RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        visibleitemcount = layoutManager.childCount
+                        totalitemcount = layoutManager.itemCount
+                        pastvisibleitem = layoutManager.findFirstVisibleItemPosition()
+                        if (dy>0) {
+                            if (isloading) {
+                                if (totalitemcount > previous_total) {
+                                    isloading = false
+                                    previous_total = totalitemcount
+                                }
+                            }
+                            if (!isloading && totalitemcount - visibleitemcount <= pastvisibleitem + view_threshold) {
+                                page++
+                                homeViewModel.load_more_search_in_gallery(search,page,api)
+                                isloading = true
+                            }
+                        }else{
+                        }
+                    }
+                })
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -73,34 +102,20 @@ class HomeFragment : Fragment() {
             }
 
         })
-        homeViewModel.galleryMutableLiveData.observe(viewLifecycleOwner, Observer {
-            imagesAdapter = ImagesAdapter(it.photos as ArrayList<Photo>, requireContext())
-            setRecyclerView(imagesAdapter)
-            if (isloading) {
-                if (totalitemcount > previous_total) {
-                    isloading = false;
-                    previous_total = totalitemcount;
-                }
-            }
-            if (!isloading && (totalitemcount - visibleitemcount) <= pastvisibleitem + view_threshold) {
-                page++;
-                homeViewModel.PerformPagination(search, 2, api);
-                Toast.makeText(activity,"success",Toast.LENGTH_LONG).show()
-                isloading = true;
-            }
+        /*homeViewModel.galleryMutableLiveData.observe(viewLifecycleOwner, Observer {
 
+            setRecyclerView(it.photos)
+        })*/
+        homeViewModel.galleryadapterLiveData.observe(viewLifecycleOwner, Observer {
+            setRecyclerView(it)
         })
-        homeViewModel.galleryMutableLiveData.observe(viewLifecycleOwner, Observer {
-            imagesAdapter.add_photo(it.photos as ArrayList<Photo>);
-            setRecyclerView(imagesAdapter)
-        })
+
         return view
     }
 
-    private fun setRecyclerView(imagesAdapter:ImagesAdapter) {
-       // imagesAdapter = ImagesAdapter(photos, requireContext())
+     fun setRecyclerView(imagesAdapter: ImagesAdapter) {
         fragmentHomeBinding.imagesRecycler.setHasFixedSize(true)
-        fragmentHomeBinding.imagesRecycler.layoutManager = gridLayoutManager
+        fragmentHomeBinding.imagesRecycler.layoutManager = layoutManager
         fragmentHomeBinding.imagesRecycler.adapter = imagesAdapter
 
     }

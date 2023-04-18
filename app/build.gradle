@@ -36,6 +36,7 @@ android {
     }
 }
 def lifecycle_version = "2.0.0"
+def paging_version = "3.1.1"
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -77,9 +78,25 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.28.3'
     kapt 'com.google.dagger:dagger-compiler:2.15'
     kapt 'com.google.dagger:dagger-android-processor:2.15'
-    implementation 'com.github.Batterii:PagingRecycler:v1.1.1'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     kapt 'com.github.bumptech.glide:compiler:4.15.1'
+
+    implementation("androidx.paging:paging-runtime:$paging_version")
+
+    // alternatively - without Android dependencies for tests
+    testImplementation("androidx.paging:paging-common:$paging_version")
+
+    // optional - RxJava2 support
+    implementation("androidx.paging:paging-rxjava2:$paging_version")
+
+    // optional - RxJava3 support
+    implementation("androidx.paging:paging-rxjava3:$paging_version")
+
+    // optional - Guava ListenableFuture support
+    implementation("androidx.paging:paging-guava:$paging_version")
+
+    // optional - Jetpack Compose integration
+    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
 
 
 }
