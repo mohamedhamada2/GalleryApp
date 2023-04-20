@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = DataBindingUtil.setContentView(this,R.layout.activity_main)
         bottomNav = activityMainBinding.bottomNav
         bottomNav.selectedItemId = R.id.home;
+        loadFragment(HomeFragment())
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> {

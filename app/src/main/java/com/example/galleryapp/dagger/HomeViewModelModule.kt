@@ -1,9 +1,12 @@
 package com.example.galleryapp.dagger
 
+import android.content.Context
 import android.util.Log
 import com.example.currency.constants.Constants
+import com.example.galleryapp.MainActivity
 import com.example.galleryapp.api.Api
 import com.example.galleryapp.fragments.home.GalleryModel
+import com.example.galleryapp.fragments.home.HomeFragment
 import com.example.galleryapp.fragments.home.ImagesAdapter
 import com.example.galleryapp.fragments.home.Photo
 import dagger.Module
@@ -30,5 +33,11 @@ object HomeViewModelModule {
     fun provide_search():String {
        return "dogs"
     }
+    /*@ViewModelScoped
+    @Provides
+    fun provide_search2(homeFragment: HomeFragment):String {
+       return homeFragment.search;
+    }*/
+
 
 }

@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(var api: Api,var page: Int,var search: String):ViewModel() {
+class HomeViewModel @Inject constructor(var api: Api):ViewModel() {
     var galleryMutableLiveData: MutableLiveData<GalleryModel> = MutableLiveData<GalleryModel>()
     var galleryadapterLiveData: MutableLiveData<ImagesAdapter> = MutableLiveData<ImagesAdapter>()
     lateinit var  imagesAdapter:ImagesAdapter
@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(var api: Api,var page: Int,var search: S
 
 
 
-    fun search_in_gallery() {
+    fun search_in_gallery(search:String,page:Int) {
         val observable: Observable<GalleryModel> = api.get_gallery(Constants.key,search,page)
             .subscribeOn(Schedulers.io())
             .debounce(4,TimeUnit.SECONDS)
@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(var api: Api,var page: Int,var search: S
             { e: Throwable -> Log.e("rrrr", e.message.toString()) })
     }
 
-    fun load_more_search_in_gallery() {
+    fun load_more_search_in_gallery(search:String,page:Int) {
         val observable: Observable<GalleryModel> = api.get_gallery(Constants.key,search,page)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

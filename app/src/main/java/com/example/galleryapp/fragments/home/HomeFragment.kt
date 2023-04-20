@@ -29,7 +29,6 @@ class HomeFragment : Fragment() {
     lateinit var search:String
     @Inject
     lateinit var retrofit: Retrofit
-    lateinit var api: Api
     lateinit var layoutManager: LinearLayoutManager
 
     private var isloading = false
@@ -49,7 +48,6 @@ class HomeFragment : Fragment() {
         //homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
         //homeViewModel = HomeViewModel(requireContext(),this)
         //(activity?.application as MyApplication).getAppComponent()!!.inject(this)
-        api = retrofit.create(Api::class.java)
         layoutManager = LinearLayoutManager(activity)
 
         /*fragmentHomeBinding.etSearch.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, event ->
@@ -73,7 +71,7 @@ class HomeFragment : Fragment() {
                 previous_total = 0
                 view_threshold  = 15
                 //search = fragmentHomeBinding.etSearch.text.toString()
-                homeViewModel.search_in_gallery()
+                homeViewModel.search_in_gallery(search,page)
                 fragmentHomeBinding.imagesRecycler.addOnScrollListener(object :
                     RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -89,8 +87,9 @@ class HomeFragment : Fragment() {
                                 }
                             }
                             if (!isloading && totalitemcount - visibleitemcount <= pastvisibleitem + view_threshold) {
+                                //HomeViewModelModule.provide_search(search)
                                 page++
-                                homeViewModel.load_more_search_in_gallery()
+                                homeViewModel.load_more_search_in_gallery(search,page)
                                 isloading = true
                             }
                         }else{
@@ -115,7 +114,11 @@ class HomeFragment : Fragment() {
         return view
     }
 
-     fun setRecyclerView(imagesAdapter: ImagesAdapter) {
+    private fun set_search(search: String):String {
+        return  search;
+    }
+
+    fun setRecyclerView(imagesAdapter: ImagesAdapter) {
         fragmentHomeBinding.imagesRecycler.setHasFixedSize(true)
         fragmentHomeBinding.imagesRecycler.layoutManager = layoutManager
         fragmentHomeBinding.imagesRecycler.adapter = imagesAdapter
