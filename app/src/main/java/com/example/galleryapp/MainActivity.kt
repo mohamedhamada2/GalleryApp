@@ -9,7 +9,9 @@ import com.example.galleryapp.fragments.AboutFragment
 import com.example.galleryapp.fragments.home.HomeFragment
 import com.example.galleryapp.fragments.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     lateinit var activityMainBinding: ActivityMainBinding
     lateinit var bottomNav: BottomNavigationView

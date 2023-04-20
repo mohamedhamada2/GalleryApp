@@ -9,22 +9,25 @@ import androidx.paging.PagingData
 import com.example.currency.constants.Constants
 import com.example.galleryapp.MainActivity
 import com.example.galleryapp.api.Api
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class HomeViewModel :ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(var api: Api,var page: Int,var search: String):ViewModel() {
     var galleryMutableLiveData: MutableLiveData<GalleryModel> = MutableLiveData<GalleryModel>()
     var galleryadapterLiveData: MutableLiveData<ImagesAdapter> = MutableLiveData<ImagesAdapter>()
-
-    lateinit var imagesAdapter : ImagesAdapter
-    lateinit var mainActivity: MainActivity
+    lateinit var  imagesAdapter:ImagesAdapter
 
 
 
-    fun search_in_gallery(search: String, page: Int, api: Api) {
+
+
+    fun search_in_gallery() {
         val observable: Observable<GalleryModel> = api.get_gallery(Constants.key,search,page)
             .subscribeOn(Schedulers.io())
             .debounce(4,TimeUnit.SECONDS)
@@ -45,8 +48,8 @@ class HomeViewModel :ViewModel() {
             { e: Throwable -> Log.e("rrrr", e.message.toString()) })
     }
 
-    fun load_more_search_in_gallery(search: String, currentPage: Int, api: Api) {
-        val observable: Observable<GalleryModel> = api.get_gallery(Constants.key,search,currentPage)
+    fun load_more_search_in_gallery() {
+        val observable: Observable<GalleryModel> = api.get_gallery(Constants.key,search,page)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 

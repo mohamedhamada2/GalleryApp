@@ -1,11 +1,15 @@
 package com.alatheer.dagger
 
 import android.app.Application
+import com.example.currency.constants.Constants
+import com.example.galleryapp.api.Api
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -15,12 +19,16 @@ import javax.inject.Singleton
 
 
 @Module
-class ApiModule {
+@InstallIn(SingletonComponent::class)
+object ApiModule {
     var mBaseUrl: String? = null
+    lateinit var okHttpClient :OkHttpClient
+    lateinit var gson:Gson
 
-    constructor(mBaseUrl: String) {
+
+    /*constructor(mBaseUrl: String) {
         this.mBaseUrl = mBaseUrl
-    }
+    }*/
 
 
 
@@ -36,7 +44,8 @@ class ApiModule {
     fun provideGson(): Gson {
         val gsonBuilder = GsonBuilder()
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-        return gsonBuilder.create()
+        gson =  gsonBuilder.create()
+        return gson
     }
 
     @Provides
@@ -44,12 +53,14 @@ class ApiModule {
     fun provideOkhttpClient(cache: Cache): OkHttpClient {
         val client = OkHttpClient.Builder()
         client.cache(cache)
-        return client.build()
+        okHttpClient = client.build()
+        return okHttpClient
     }
 
     @Provides
     @Singleton
     fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
+        mBaseUrl = Constants.url
          var retrofit = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -57,5 +68,11 @@ class ApiModule {
             .client(okHttpClient)
             .build()
         return retrofit
+    }
+    @Provides
+    @Singleton
+    fun provideApiInterface(): Api {
+        val retrofit = provideRetrofit(gson, okHttpClient)
+        return retrofit.create(Api::class.java)
     }
 }

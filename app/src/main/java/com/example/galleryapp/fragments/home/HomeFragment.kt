@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,13 +17,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.currency.dagger.MyApplication
 import com.example.galleryapp.R
 import com.example.galleryapp.api.Api
+import com.example.galleryapp.dagger.HomeViewModelModule
 import com.example.galleryapp.databinding.FragmentHomeBinding
+import dagger.hilt.android.AndroidEntryPoint
 import retrofit2.Retrofit
 import javax.inject.Inject
-
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
-    lateinit var homeViewModel: HomeViewModel
+    val homeViewModel: HomeViewModel by viewModels()
     lateinit var fragmentHomeBinding: FragmentHomeBinding
     lateinit var search:String
     @Inject
@@ -44,9 +46,9 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         fragmentHomeBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         val view = fragmentHomeBinding.root;
-        homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
+        //homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
         //homeViewModel = HomeViewModel(requireContext(),this)
-        (activity?.application as MyApplication).getAppComponent()!!.inject(this)
+        //(activity?.application as MyApplication).getAppComponent()!!.inject(this)
         api = retrofit.create(Api::class.java)
         layoutManager = LinearLayoutManager(activity)
 
@@ -71,7 +73,7 @@ class HomeFragment : Fragment() {
                 previous_total = 0
                 view_threshold  = 15
                 //search = fragmentHomeBinding.etSearch.text.toString()
-                homeViewModel.search_in_gallery(search, 1, api)
+                homeViewModel.search_in_gallery()
                 fragmentHomeBinding.imagesRecycler.addOnScrollListener(object :
                     RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -88,7 +90,7 @@ class HomeFragment : Fragment() {
                             }
                             if (!isloading && totalitemcount - visibleitemcount <= pastvisibleitem + view_threshold) {
                                 page++
-                                homeViewModel.load_more_search_in_gallery(search,page,api)
+                                homeViewModel.load_more_search_in_gallery()
                                 isloading = true
                             }
                         }else{
@@ -117,12 +119,6 @@ class HomeFragment : Fragment() {
         fragmentHomeBinding.imagesRecycler.setHasFixedSize(true)
         fragmentHomeBinding.imagesRecycler.layoutManager = layoutManager
         fragmentHomeBinding.imagesRecycler.adapter = imagesAdapter
-
-    }
-
-    private fun performSearch() {
-        search = fragmentHomeBinding.etSearch.text.toString()
-        homeViewModel.search_in_gallery(search,1,api)
 
     }
 }
