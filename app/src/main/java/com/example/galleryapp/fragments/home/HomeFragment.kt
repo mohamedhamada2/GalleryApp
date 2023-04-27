@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.currency.dagger.MyApplication
@@ -29,7 +30,7 @@ class HomeFragment : Fragment() {
     lateinit var search:String
     @Inject
     lateinit var retrofit: Retrofit
-    lateinit var layoutManager: LinearLayoutManager
+    lateinit var layoutManager: GridLayoutManager
 
     private var isloading = false
     private var pastvisibleitem = 0
@@ -48,7 +49,7 @@ class HomeFragment : Fragment() {
         //homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
         //homeViewModel = HomeViewModel(requireContext(),this)
         //(activity?.application as MyApplication).getAppComponent()!!.inject(this)
-        layoutManager = LinearLayoutManager(activity)
+        layoutManager = GridLayoutManager(activity,2)
 
         /*fragmentHomeBinding.etSearch.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -109,6 +110,13 @@ class HomeFragment : Fragment() {
         })*/
         homeViewModel.galleryadapterLiveData.observe(viewLifecycleOwner, Observer {
             setRecyclerView(it)
+        })
+        homeViewModel.loading.observe(viewLifecycleOwner, Observer {
+            if (it == 1){
+                fragmentHomeBinding.progressBar.visibility= View.VISIBLE
+            }else{
+                fragmentHomeBinding.progressBar.visibility= View.INVISIBLE
+            }
         })
 
         return view

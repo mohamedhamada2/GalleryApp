@@ -23,6 +23,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/nav_menu"
             android:scrollIndicators="left"
-            android:theme="@style/Widget.BottomNavigationView"/>
+            android:theme="@style/Widget.BottomNavigationView"
+            app:labelVisibilityMode="unlabeled"
+            app:itemBackground="@drawable/selector_checked_uncheked"
+            app:itemIconTint="@drawable/bottom_nav_color"/>
     </RelativeLayout>
 </layout>

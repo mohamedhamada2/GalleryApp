@@ -21,6 +21,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(var api: Api):ViewModel() {
     var galleryMutableLiveData: MutableLiveData<GalleryModel> = MutableLiveData<GalleryModel>()
     var galleryadapterLiveData: MutableLiveData<ImagesAdapter> = MutableLiveData<ImagesAdapter>()
+    var loading :MutableLiveData<Int> = MutableLiveData<Int>()
     lateinit var  imagesAdapter:ImagesAdapter
 
 
@@ -37,8 +38,17 @@ class HomeViewModel @Inject constructor(var api: Api):ViewModel() {
         observable.subscribe(
             { o: GalleryModel? ->
                 if (o != null) {
+                    if (!o.photos.isEmpty()){
                         imagesAdapter = ImagesAdapter(o.photos as ArrayList<Photo>)
-                         galleryadapterLiveData.value = imagesAdapter
+                        galleryadapterLiveData.value = imagesAdapter
+                        loading.value = 1
+
+                    }else{
+                        imagesAdapter = ImagesAdapter(o.photos as ArrayList<Photo>)
+                        loading.value = 0
+
+                    }
+
                         //homeFragment.setRecyclerView(imagesAdapter)
                         //load_more_search_in_gallery()
                         //imagesAdapter.addLoadingFooter(o.photos);
@@ -60,10 +70,11 @@ class HomeViewModel @Inject constructor(var api: Api):ViewModel() {
                         //Toast.makeText(mainActivity,currentPage.toString(),Toast.LENGTH_LONG).show()
                         //galleryMutableLiveData.value = o
                         imagesAdapter.add_photo(o.photos);
+                        loading.value = 1
                         //galleryadapterLiveData.value = imagesAdapter
                         //imagesAdapter.addLoadingFooter(o.photos);
                     }else{
-
+                        loading.value = 0
                     }
 
                 }
